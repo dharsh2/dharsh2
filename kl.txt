@@ -1,0 +1,98 @@
+graph={'v1':[('v2',5),('v4',2)],'v2':[('v1',5),('v3',1),('v4',1)],'v3':[('V2',1),('v4',5),('v6',1)],'v4':[('V2',1),('V1',2),('v3',5),('v5',1)],'v5':[('v4',1),('v6',1),('V8',3)],'v6':[('v5',1),('v3',1),('v7',2),('v8',1)],'v7':[('v6',2),('v8',1)],'v8':[('v6',1),('v5',3),('V7',1)]}
+part1=[]
+part2=[]
+part1.append(['v1','v7','v5','v3'])
+part2.append(['v4','v8','v6','v2'])
+n=4
+locked={'v1':0,'v2':0,'v3':0,'v4':0,'v5':0,'v6':0,'v7':0,'v8':0}
+maxGains=[]
+for i in range (0,n):
+    print("Iteration %d" %(i+1))
+    D={}
+    for node in part1[i]:
+        I=E=0
+        for key in graph[node]:
+            if key[0] in part1[i] and locked[node]!=1:
+                I=I+key[1]
+            else:
+                E=E+key[1]
+        D[node]=E-I
+    for node in part2[i]:
+        I=E=0
+        for key in graph[node]:
+            if key[0] in part2[i] and locked[node]!=1:
+                I=I+key[1]
+            else:
+                E=E+key[1]
+        D[node]=E-I
+    print ("Gain of Each Node")
+    print(D)
+    gains=[]
+    for node1 in part1[i]:
+        if locked[node1]!=1:
+            for node2 in part2[i]:
+                if locked[node2]!=1:
+                    connection=0
+                    for key in graph[node1]:
+                        if key[0]==node2:
+                            connection=key[1]
+                    gain=[node1,node2,D[node1]+D[node2]-(2*(connection))]
+                    gains.append(gain)
+    print("Gain of Swapping the Nodes")
+    print(gains)
+    Max=[gains[0][0],gains[0][1],gains[0][2]]
+    for list in gains:
+        if list[2]>Max[2]:
+            Max=list
+    print("Maximum Gain : ",end=" ")
+    print(Max) 
+    maxGains.append(Max)
+    locked[Max[0]]=1
+    locked[Max[1]]=1
+    newPart1=[]
+    for node in part1[i]:
+        if node!=Max[0]:
+            newPart1.append(node)
+    newPart1.append(Max[1])
+    newPart2=[]
+    for node in part2[i]:
+        if node!=Max[1]:
+            newPart2.append(node)
+    newPart2.append(Max[0])
+    part1.append(newPart1)
+    part2.append(newPart2)
+    print("New Partition 1 : ",end=" ")
+
+    print(part1[i+1])
+    print("New Partition 2 : ",end=" ")
+    print(part2[i+1])
+    print("")
+    print("Partitions and Max Gains of each Iteration")
+    print("Partition 1 : ",end=" ")
+    print(part1)
+    print("Partition 2 : ",end=" ")
+    print(part2)
+    print("Max Gains : ",end=" ")
+    print(maxGains)
+    Gn=[]
+    cut=[], ans=[]
+    sum=0
+    for list in maxGains:
+        sum+=list[2]
+        Gn.append(sum)
+    print()
+    index=Gn.index(max(Gn))
+    print("Final Partition with Max Gain and Min Cut Cost")
+    print("Partition 1 : ",end=" ")
+    print(part1[index+1])
+    print("Partition 2 : ",end=" ")
+    print(part2[index+1])
+    cutcost=0
+    for node in part1[index+1]:
+        for key in graph[node]:
+            if key[0] in part2[index+1]:
+                cutcost+=key[1]
+                cut.append(cutcost)
+    cutsize=min(cut)
+print("\nMinimum CutCost Obtained : ",end=" ")
+print(cutsize)
